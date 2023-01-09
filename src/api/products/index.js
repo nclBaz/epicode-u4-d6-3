@@ -11,12 +11,13 @@ import {
 } from "../../lib/db/productsTools.js"
 import { findReviewByIdAndDelete, saveNewReview } from "../../lib/db/reviewsTools.js"
 import { deleteProductsPicture, saveProductsPictures } from "../../lib/fs/tools.js"
+import { checkNewProductSchema, checkValidationResult } from "./productsValidation.js"
 
 const { NotFound } = createHttpError
 
 const productsRouter = express.Router()
 
-productsRouter.post("/", async (req, res, next) => {
+productsRouter.post("/", checkNewProductSchema, checkValidationResult, async (req, res, next) => {
   try {
     const id = await saveNewProduct(req.body)
     res.status(201).send({ id })

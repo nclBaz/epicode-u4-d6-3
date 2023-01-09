@@ -1,6 +1,8 @@
 export const badRequestHandler = (err, req, res, next) => {
   if (err.status === 400) {
-    res.status(400).send({ success: false, message: err.message })
+    res
+      .status(400)
+      .send({ success: false, message: err.message, errors: err.errorsList.map(e => e.msg) })
   } else {
     next(err)
   }
