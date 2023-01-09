@@ -8,8 +8,9 @@ import {
   findProductById,
   findProductByIdAndUpdate,
   findProductByIdAndDelete,
-} from "../../lib/db/tools.js"
-import { saveProductsPictures } from "../../lib/fs/tools.js"
+} from "../../lib/db/productsTools.js"
+import { findReviewByIdAndDelete, saveNewReview } from "../../lib/db/reviewsTools.js"
+import { deleteProductsPicture, saveProductsPictures } from "../../lib/fs/tools.js"
 
 const { NotFound } = createHttpError
 
@@ -103,5 +104,48 @@ productsRouter.patch(
     }
   }
 )
+
+productsRouter.post("/:productId/reviews", async (req, res, next) => {
+  try {
+    const product = await saveNewReview(req.params.productId, req.body)
+    if (product) {
+      res.send(product)
+    } else {
+      next(NotFound(`Product with id ${req.params.productId} not found!`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
+productsRouter.get("/:productId/reviews", async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error)
+  }
+})
+
+productsRouter.get("/:productId/reviews/:reviewId", async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error)
+  }
+})
+
+productsRouter.put("/:productId/reviews/:reviewId", async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error)
+  }
+})
+
+productsRouter.delete("/:productId/reviews/:reviewId", async (req, res, next) => {
+  try {
+    await findReviewByIdAndDelete(req.params.productId, req.params.reviewId)
+    res.status(204).send()
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default productsRouter

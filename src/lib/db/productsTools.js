@@ -1,5 +1,5 @@
 import uniqid from "uniqid"
-import { getProducts, writeProducts } from "../fs/tools.js"
+import { deleteProductsPicture, getProducts, writeProducts } from "../fs/tools.js"
 
 export const saveNewProduct = async newProductData => {
   const products = await getProducts()
@@ -48,6 +48,7 @@ export const findProductByIdAndDelete = async productId => {
   const product = await findProductById(productId)
 
   if (product) {
+    await deleteProductsPicture(product.imageUrl)
     const remainingProducts = products.filter(product => product.id !== productId)
     await writeProducts(remainingProducts)
     return product
