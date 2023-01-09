@@ -1,5 +1,7 @@
 import express from "express"
 import createHttpError from "http-errors"
+import multer from "multer"
+import { extname } from "path"
 import {
   saveNewProduct,
   findProducts,
@@ -7,6 +9,7 @@ import {
   findProductByIdAndUpdate,
   findProductByIdAndDelete,
 } from "../../lib/db/tools.js"
+import { saveProductsPictures } from "../../lib/fs/tools.js"
 
 const { NotFound } = createHttpError
 
@@ -70,5 +73,35 @@ productsRouter.delete("/:productId", async (req, res, next) => {
     next(error)
   }
 })
+
+productsRouter.patch(
+  "/:productId/image",
+  multer().single("productPicture"),
+  async (req, res, next) => {
+    try {
+      /*     console.log(req.body)
+      await saveNewProduct({...req.body, imageUrl: `/img/products/${filename}` })
+      await saveProductsPictures(req.file.buffer, filename) */
+      console.log(req.file)
+      // 1. Create a unique name for that picture (something like productId.png)
+      const filename = req.params.productId + extname(req.file.originalname)
+
+      // 2. Update the product record with the image url
+      const product = await findProductByIdAndUpdate(req.params.productId, {
+        imageUrl: `/img/products/${filename}`,
+      })
+
+      if (product) {
+        // 3. Save the file into the public folder
+        await saveProductsPictures(req.file.buffer, filename)
+        res.send(product)
+      } else {
+        next(NotFound(`Product with id ${req.params.productId} not found!`))
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 export default productsRouter
